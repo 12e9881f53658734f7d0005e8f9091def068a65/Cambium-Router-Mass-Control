@@ -62,7 +62,7 @@ def startPacketLogging(ip, s, outPutFileName, duration):
         "X-XSRF-TOKEN": s.cookies.get_dict()["XSRF-TOKEN"],
         "Content-Type": "application/json;charset=utf-8"
     }
-    # Content length might be requred
+
     data = {
         "arguments":{
             "count": "0",
@@ -77,16 +77,13 @@ def startPacketLogging(ip, s, outPutFileName, duration):
     }
     stopCommands(ip, s)
     res = s.post(f"http://{ip}/api/exec-command", json=data, headers=headers)
-    print(res.text)
+
     try:
-        if res.json()["success"]:
-            return True
-        else:
-            print("Packet logging not started.")
-            return
+        res.json()["success"]
+        print(f"Packet logging for {duration} seconds.")
+        return True
     except:
-        print("Packet logging not started.")
-        return
+        print("Packet logging not started")
 
 def downloadPCAPfile(ip, s, fileName):
     headers = {
@@ -104,17 +101,15 @@ def downloadPCAPfile(ip, s, fileName):
         return
 
 
-# must add session as an argument for all functions 
-# CLEAR ALL JOBS BEFORE COS IT WILL DOWNLOAD RANDOM FILE OR NOT DO TEST
-# add support for multiple returns from checkpacketlogging status
-# pcap START does not work
+
+
 ip = "172.19.61.212"
 fileName = "PCAPFILETESTING.pcap"
 duration = 5
 
 login(ip, s)
 startPacketLogging(ip, s, fileName, duration)
-sleep(duration)
+sleep(duration + 2)
 check = checkPacketLoggingStatus(ip, s, fileName)
 while check == False:
     sleep(2)
